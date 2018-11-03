@@ -1,5 +1,7 @@
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
+#define GEARNUM = 5;
+
 SoftwareSerial mySerial(10, 2);
 
 int startButton = 3;
@@ -108,34 +110,28 @@ void locateXY(float x, float y) {
 void locate(float distance, float height, float alpha) {
   float len = distanceFromOrigin(distance, height);
   float jiaodu = atan(height / distance);
-  int pwn0, pwn1, pwn2, pwn3;
+  int[4] pwn;
 
-  getEveryGearCondition();
-  String temp0 = "0000";
-  String temp1 = "0000";
-  String temp2 = "0000";
-  String temp3 = "0000";
-  putEveryGearConditionIntoString();
+  getEveryGearPwn();
+  String[4] temp;
+  for (int i=0;i<4;i++){
+    temp[i] = getStirngByPwn(pwn[i]);
+  }
   sendGearMessage();
 }
-void getEveryGearCondition() {
-  pwn0 = thetaToPwn((alpha) );
-  pwn1 = thetaToPwn(PI / float(2) - jiaodu - acos((25 * pow(len, 2) - 6196) / float(40 * (13 * len + 200))));
-  pwn2 = thetaToPwn(acos((25 * pow(len, 2) + 421) / float(50 * (15 * len + 104))));
-  pwn3 = thetaToPwn(acos((25 * pow(len, 2) - 6196) / float(40 * (13 * len + 200)))  + 20 / float(180) * PI) ;
+void getEveryGearPwn() {
+  pwn[0] = thetaToPwn((alpha) );
+  pwn[1] = thetaToPwn(PI / float(2) - jiaodu - acos((25 * pow(len, 2) - 6196) / float(40 * (13 * len + 200))));
+  pwn[2] = thetaToPwn(acos((25 * pow(len, 2) + 421) / float(50 * (15 * len + 104))));
+  pwn[3] = thetaToPwn(acos((25 * pow(len, 2) - 6196) / float(40 * (13 * len + 200)))  + 20 / float(180) * PI) ;
 }
-void putGearConditionIntoString() {
-  temp0 += pwn0;
-  temp1 += pwn1;
-  temp2 += pwn2;
-  temp3 += pwn3;
-  temp0 = temp0.substring(temp0.length() - 4);
-  temp1 = temp1.substring(temp1.length() - 4);
-  temp2 = temp2.substring(temp2.length() - 4);
-  temp3 = temp3.substring(temp3.length() - 4);
+String getStringByPwn(int pwn) {
+  String string = "0000";
+  string += pwn;
+  return(string.substring(temp0.length() - 4));
 }
 void sendGearMessage() {
-  mySerial.println("{#000P" + temp0 + "T1000!#001P" + temp1 + "T1000!#002P" + temp2 + "T1000!#003P" + temp3 + "T1000!}");
+  mySerial.println("{#000P" + temp[0] + "T1000!#001P" + temp[1] + "T1000!#002P" + temp[2] + "T1000!#003P" + temp[3] + "T1000!}");
   delay(1000);
 }
 
